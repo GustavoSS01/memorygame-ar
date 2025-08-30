@@ -1,90 +1,112 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>VR Memory Game</title>
-    <meta name="description" content="Memory Game in VR using A-Frame">
-    <!-- A-Frame library -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <!-- Animation component for A-Frame -->
-    <script src="https://unpkg.com/aframe-animation-component@3.2.1/dist/aframe-animation-component.min.js"></script>
-    <!-- Environment component for A-Frame -->
-    <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
-    <!-- Custom game scripts -->
-    <script src="js/memory-game.js"></script>
-    <style>
-        .centered {
-            position: fixed;
-            top: 10px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-family: Arial, sans-serif;
-            z-index: 999;
-            text-shadow: 0 0 5px black;
-        }
-    </style>
-</head>
-<body>
-    <div class="centered">
-        <h2 id="score">Pairs Found: 0</h2>
-        <h3 id="message"></h3>
-    </div>
+    <head>
+        <meta charset="utf-8" />
+        <title>VR Memory Game</title>
+        <meta name="description" content="Memory Game in VR using A-Frame" />
+        <!-- A-Frame library -->
+        <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+        <!-- Animation component for A-Frame -->
+        <script src="https://unpkg.com/aframe-animation-component@3.2.1/dist/aframe-animation-component.min.js"></script>
+        <!-- Environment component for A-Frame -->
+        <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+        <!-- Custom game scripts -->
+        <script src="js/memory-game.js"></script>
+        <style>
+            .centered {
+                position: fixed;
+                top: 10px;
+                width: 100%;
+                text-align: center;
+                color: white;
+                font-family: Arial, sans-serif;
+                z-index: 999;
+                text-shadow: 0 0 5px black;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="centered">
+            <h2 id="score">Pares Encontrados: 0</h2>
+            <h3 id="message"></h3>
+        </div>
 
-    <a-scene memory-game background="color: #FAFAFA">
-        <!-- Camera and controls -->
-        <a-entity id="rig" position="0 1.6 0">
-            <a-camera look-controls wasd-controls>
-                <a-entity cursor="fuse: true; fuseTimeout: 500"
-                          position="0 0 -1"
-                          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                          material="color: white; shader: flat"
-                          animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
-                          animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 500; from: 1 1 1; to: 0.1 0.1 0.1"
-                          animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1"
-                          raycaster="objects: .clickable; far: 20; interval: 100">
-                </a-entity>
-            </a-camera>
-        </a-entity>
+        <a-scene memory-game background="color: #FAFAFA">
+            <!-- Música de fundo (corrigido para autoplay em navegadores modernos) -->
+            <audio id="bg-music" src="assets/STARSET- It Has Begun (instrumental).mp3" loop autoplay style="display:none"></audio>
+            <a-entity id="bg-music-entity"></a-entity>
 
-        <!-- Environment -->
-        <a-entity environment="preset: forest; dressingAmount: 500"></a-entity>
+            <!-- Camera and controls -->
+            <a-entity id="rig" position="0 1.2 0">
+                <a-camera look-controls wasd-controls>
+                    <a-entity
+                        cursor="fuse: true; fuseTimeout: 500"
+                        position="0 0 -1"
+                        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                        material="color: white; shader: flat"
+                        animation__click="property: scale; startEvents: click; easing: easeInCubic; dur: 150; from: 0.1 0.1 0.1; to: 1 1 1"
+                        animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 500; from: 1 1 1; to: 0.1 0.1 0.1"
+                        animation__mouseleave="property: scale; startEvents: mouseleave; easing: easeInCubic; dur: 500; to: 1 1 1"
+                        raycaster="objects: .clickable; far: 20; interval: 100"
+                    >
+                    </a-entity>
+                </a-camera>
+            </a-entity>
 
-        <!-- Game board -->
-        <a-entity id="game-board" position="0 1.6 -2">
-            <!-- Cards will be generated by the script -->
-        </a-entity>
+            <!-- Environment -->
+            <a-entity environment="preset: starry"></a-entity>
 
-        <!-- Game completed message -->
-        <a-entity id="victory-message"
-                  position="0 1.6 -1.5"
-                  text="value: Congratulations! You won!; align: center; width: 2; color: #FFF; opacity: 0"
-                  visible="false">
-        </a-entity>
+            <!-- Game board -->
+            <a-entity id="game-board" position="0 1.6 -2">
+                <!-- Cards will be generated by the script -->
+            </a-entity>
 
-        <!-- Restart button -->
-        <a-entity id="restart-button"
-                  position="0 1 -1.5"
-                  geometry="primitive: box; width: 0.5; height: 0.2; depth: 0.05"
-                  material="color: #4CC3D9"
-                  text="value: Restart; align: center; width: 2; color: #FFF;"
-                  visible="false"
-                  class="clickable">
-        </a-entity>
-    </a-scene>
+            <!-- Game completed message -->
+            <a-entity
+                id="victory-message"
+                position="0 1.6 -1.5"
+                text="value: Parabéns! Você venceu!; align: center; width: 2; color: #FFF; opacity: 0"
+                visible="false"
+            >
+            </a-entity>
 
-    <!-- Adicionar script auxiliar para debug -->
-    <script>
-        // Ajuda a depurar eventos de clique
-        document.addEventListener('DOMContentLoaded', () => {
-            // Debug no console quando um elemento clickable é clicado
-            const clickables = document.querySelectorAll('.clickable');
-            clickables.forEach(el => {
-                el.addEventListener('click', () => {
-                    console.log('Elemento clicado:', el);
+            <!-- Restart button -->
+            <a-entity
+                id="restart-button"
+                position="0 1 -1.5"
+                geometry="primitive: box; width: 0.5; height: 0.2; depth: 0.05"
+                material="color: #4CC3D9"
+                text="value: Reiniciar; align: center; width: 2; color: #FFF;"
+                visible="false"
+                class="clickable"
+            >
+            </a-entity>
+        </a-scene>
+
+        <!-- Script para garantir que a música toque após interação do usuário -->
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                // Força o áudio a tocar após a primeira interação do usuário
+                const audio = document.getElementById("bg-music");
+                let played = false;
+                function tryPlayMusic() {
+                    if (!played) {
+                        audio.volume = 0.5;
+                        audio.play().catch(() => {});
+                        played = true;
+                    }
+                }
+                document.body.addEventListener("click", tryPlayMusic, { once: true });
+                document.body.addEventListener("touchstart", tryPlayMusic, { once: true });
+
+                // Debug no console quando um elemento clickable é clicado
+                const clickables = document.querySelectorAll(".clickable");
+                clickables.forEach((el) => {
+                    el.addEventListener("click", () => {
+                        console.log("Elemento clicado:", el);
+                    });
                 });
             });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 </html>
